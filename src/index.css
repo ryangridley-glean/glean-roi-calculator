@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-glean-surface text-glean-text-primary font-sans;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-card border border-glean-border p-5;
+  }
+  .stat-number {
+    @apply text-3xl font-bold text-glean-text-primary tracking-tight;
+  }
+  .section-label {
+    @apply text-sm font-medium text-glean-text-secondary uppercase tracking-wide;
+  }
+}
