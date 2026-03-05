@@ -31,8 +31,6 @@ export function ActiveUsersByProduct({ snapshots, isLoading }: ActiveUsersByProd
 
   if (isLoading) return <Skeleton className="h-72 w-full rounded-xl" />
 
-  const factor = window === 'MAU' ? 1 : window === 'WAU' ? 0.45 : 0.15
-
   const data = downsample(snapshots).map(s => {
     const base = window === 'MAU' ? s.mau : window === 'WAU' ? s.wau : s.activeUsers
     return {

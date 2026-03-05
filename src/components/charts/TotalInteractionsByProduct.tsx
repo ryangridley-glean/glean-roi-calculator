@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  Cell, LabelList, ResponsiveContainer,
+  LabelList, ResponsiveContainer,
 } from 'recharts'
 import type { DailySnapshot } from '@/types/metrics'
 import { formatShortDate } from '@/lib/formatters'

@@ -19,7 +19,7 @@ export class GleanDataProvider implements DataProvider {
   async getMetrics(_req: MetricsRequest): Promise<MetricsResponse> {
     // TODO: implement when Glean Admin API credentials are available
     // Map MetricsRequest → Glean query params, then transform response
-    const _raw = await this.client.get(ENDPOINTS.analytics)
+    await this.client.get(ENDPOINTS.analytics)
     throw new Error('Glean API integration not yet implemented. Set VITE_USE_MOCK=true.')
   }
 
@@ -29,7 +29,7 @@ export class GleanDataProvider implements DataProvider {
   }
 
   async getContract(): Promise<ContractInfo> {
-    const _raw = await this.client.get(ENDPOINTS.contract)
+    await this.client.get(ENDPOINTS.contract)
     throw new Error('Glean API integration not yet implemented.')
   }
 

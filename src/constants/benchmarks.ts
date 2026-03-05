@@ -27,6 +27,6 @@ export function computeTimeSavedMinutes(
   )
 }
 
-export function minutesToDollarValue(minutes: number, hourlyRate = BENCHMARKS.avgHourlySalaryUsd): number {
+export function minutesToDollarValue(minutes: number, hourlyRate: number = BENCHMARKS.avgHourlySalaryUsd): number {
   return (minutes / 60) * hourlyRate
 }
