@@ -27,8 +27,6 @@ export function ManagersPage() {
         <h1 className="text-2xl font-semibold text-gray-900">Managers</h1>
         <p className="text-sm text-gray-500 mt-1">Team-level adoption analytics and manager accountability</p>
       </div>
-
-      {/* Summary */}
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Champion managers', value: champions, color: 'text-emerald-600', desc: 'driving strong team adoption' },
@@ -42,8 +40,6 @@ export function ManagersPage() {
           </div>
         ))}
       </div>
-
-      {/* Manager list */}
       <div className="grid grid-cols-1 gap-3">
         {MANAGERS.sort((a,b) => (b.wau/b.teamSize) - (a.wau/a.teamSize)).map(mgr => {
           const cfg = STATUS_CONFIG[mgr.status as keyof typeof STATUS_CONFIG]
@@ -51,9 +47,7 @@ export function ManagersPage() {
           return (
             <div key={mgr.name} className={`rounded-xl border p-4 ${cfg.bg} ${cfg.border}`}>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-gray-600 text-sm shrink-0">
-                  {mgr.name.split(' ').map(n=>n[0]).join('')}
-                </div>
+                <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-gray-600 text-sm shrink-0">{mgr.name.split(' ').map(n=>n[0]).join('')}</div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-gray-900 text-sm">{mgr.name}</p>
@@ -62,20 +56,12 @@ export function ManagersPage() {
                   <p className="text-xs text-gray-500">{mgr.dept} · {mgr.teamSize} direct reports</p>
                 </div>
                 <div className="grid grid-cols-4 gap-5 text-right">
-                  {[
-                    { label: 'WAU',      val: `${mgr.wau} / ${mgr.teamSize}` },
-                    { label: 'Activity', val: `${actPct}%` },
-                    { label: 'Searches', val: mgr.searches.toLocaleString() },
-                    { label: 'Chats',    val: mgr.chats.toLocaleString() },
-                  ].map(s => (
-                    <div key={s.label}>
-                      <p className="text-sm font-bold text-gray-900">{s.val}</p>
-                      <p className="text-[10px] text-gray-400">{s.label}</p>
-                    </div>
+                  {[{ label: 'WAU', val: `${mgr.wau} / ${mgr.teamSize}` },{ label: 'Activity', val: `${actPct}%` },{ label: 'Searches', val: mgr.searches.toLocaleString() },{ label: 'Chats', val: mgr.chats.toLocaleString() }].map(s => (
+                    <div key={s.label}><p className="text-sm font-bold text-gray-900">{s.val}</p><p className="text-[10px] text-gray-400">{s.label}</p></div>
                   ))}
                 </div>
               </div>
-              {(mgr.status === 'at-risk' || mgr.status === 'critical') && (
+              {mgr.status !== 'champion' && mgr.status !== 'healthy' && (
                 <div className="mt-3 pt-3 border-t border-opacity-30 border-current text-xs text-amber-800">
                   💡 <strong>Suggested action:</strong> Schedule a 1:1 with {mgr.name.split(' ')[0]} to review Glean adoption blockers for their {mgr.dept} team.
                 </div>
