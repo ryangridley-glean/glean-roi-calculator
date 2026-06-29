@@ -5,7 +5,7 @@ import {
   tokenCostUsd,
   type FrontierModelId,
 } from '@/constants/modelRates'
-import type { WaldoUsageSummary } from '@/types/metrics'
+import type { DailySnapshot, ModelTokenUsage, WaldoUsageSummary } from '@/types/metrics'
 
 export interface ModelSavingsBreakdown {
   modelId: FrontierModelId
@@ -44,6 +44,57 @@ function perQueryDiverted() {
     input: withoutWaldo.frontierInput - withWaldo.frontierInput,
     output: withoutWaldo.frontierOutput - withWaldo.frontierOutput,
     total: WALDO_PER_QUERY.divertedTotalTokens,
+  }
+}
+
+function buildFrontierTokenUsage(
+  queries: number,
+  scenario: 'with' | 'without',
+): ModelTokenUsage[] {
+  const { withoutWaldo, withWaldo } = WALDO_PER_QUERY
+
+  return (Object.keys(FRONTIER_MODEL_SHARES) as FrontierModelId[]).map(modelId => {
+    const share = FRONTIER_MODEL_SHARES[modelId]
+    const qShare = queries * share
+
+    if (scenario === 'without') {
+      return {
+        modelId,
+        inputTokens: Math.round(withoutWaldo.frontierInput * qShare),
+        outputTokens: Math.round(withoutWaldo.frontierOutput * qShare),
+      }
+    }
+
+    return {
+      modelId,
+      inputTokens: Math.round(withWaldo.frontierInput * qShare),
+      outputTokens: Math.round(withWaldo.frontierOutput * qShare),
+    }
+  })
+}
+
+export function buildWaldoUsageFromSnapshots(snapshots: DailySnapshot[]): WaldoUsageSummary {
+  const dailySnapshots = snapshots.map(s => ({
+    date: s.date,
+    waldoEligibleQueries: Math.max(0, s.chatSessions + s.agentRuns),
+  }))
+
+  const waldoEligibleQueries = dailySnapshots.reduce((sum, d) => sum + d.waldoEligibleQueries, 0)
+
+  const withWaldo: ModelTokenUsage[] = [
+    ...buildFrontierTokenUsage(waldoEligibleQueries, 'with'),
+    {
+      modelId: 'waldo',
+      inputTokens: Math.round(WALDO_PER_QUERY.withWaldo.waldoInput * waldoEligibleQueries),
+      outputTokens: Math.round(WALDO_PER_QUERY.withWaldo.waldoOutput * waldoEligibleQueries),
+    },
+  ]
+
+  return {
+    waldoEligibleQueries,
+    withWaldo,
+    withoutWaldo: buildFrontierTokenUsage(waldoEligibleQueries, 'without'),
+    dailySnapshots,
   }
 }
 

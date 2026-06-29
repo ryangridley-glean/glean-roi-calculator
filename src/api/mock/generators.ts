@@ -1,10 +1,6 @@
 import { daysBetween } from '@/lib/dateUtils'
-import {
-  FRONTIER_MODEL_SHARES,
-  WALDO_PER_QUERY,
-  type FrontierModelId,
-} from '@/constants/modelRates'
-import type { DailySnapshot, DepartmentUsage, ModelTokenUsage, WaldoUsageSummary } from '@/types/metrics'
+import { buildWaldoUsageFromSnapshots } from '@/lib/waldoValue'
+import type { DailySnapshot, DepartmentUsage } from '@/types/metrics'
 
 const DEPARTMENTS = ['Engineering', 'Sales', 'Marketing', 'Support', 'Finance', 'HR', 'Legal', 'Product']
 const DEPT_WEIGHTS = [0.28, 0.22, 0.14, 0.12, 0.08, 0.07, 0.05, 0.04]
@@ -88,51 +84,31 @@ export function generateDepartmentUsage(snapshots: DailySnapshot[]): DepartmentU
   })
 }
 
-function buildFrontierTokenUsage(
-  queries: number,
-  scenario: 'with' | 'without',
-): ModelTokenUsage[] {
-  const { withoutWaldo, withWaldo } = WALDO_PER_QUERY
-
-  return (Object.keys(FRONTIER_MODEL_SHARES) as FrontierModelId[]).map(modelId => {
-    const share = FRONTIER_MODEL_SHARES[modelId]
-    const qShare = queries * share
-
-    if (scenario === 'without') {
-      return {
-        modelId,
-        inputTokens: Math.round(withoutWaldo.frontierInput * qShare),
-        outputTokens: Math.round(withoutWaldo.frontierOutput * qShare),
-      }
-    }
-
-    return {
-      modelId,
-      inputTokens: Math.round(withWaldo.frontierInput * qShare),
-      outputTokens: Math.round(withWaldo.frontierOutput * qShare),
-    }
-  })
-}
-
-export function generateWaldoUsage(snapshots: DailySnapshot[]): WaldoUsageSummary {
+export function generateWaldoUsage(snapshots: DailySnapshot[]) {
   const dailySnapshots = snapshots.map((s, i) => {
     const variance = 1 + (seededRand(i * 11 + 7) - 0.5) * 0.1
     const queries = Math.max(0, Math.round((s.chatSessions + s.agentRuns) * variance))
     return { date: s.date, waldoEligibleQueries: queries }
   })
 
+  const base = buildWaldoUsageFromSnapshots(snapshots)
   const waldoEligibleQueries = dailySnapshots.reduce((sum, d) => sum + d.waldoEligibleQueries, 0)
+  const scale = base.waldoEligibleQueries > 0
+    ? waldoEligibleQueries / base.waldoEligibleQueries
+    : 1
 
-  const withWaldo: ModelTokenUsage[] = [
-    ...buildFrontierTokenUsage(waldoEligibleQueries, 'with'),
-    {
-      modelId: 'waldo',
-      inputTokens: Math.round(WALDO_PER_QUERY.withWaldo.waldoInput * waldoEligibleQueries),
-      outputTokens: Math.round(WALDO_PER_QUERY.withWaldo.waldoOutput * waldoEligibleQueries),
-    },
-  ]
-
-  const withoutWaldo = buildFrontierTokenUsage(waldoEligibleQueries, 'without')
-
-  return { waldoEligibleQueries, withWaldo, withoutWaldo, dailySnapshots }
+  return {
+    waldoEligibleQueries,
+    dailySnapshots,
+    withWaldo: base.withWaldo.map(row => ({
+      ...row,
+      inputTokens: Math.round(row.inputTokens * scale),
+      outputTokens: Math.round(row.outputTokens * scale),
+    })),
+    withoutWaldo: base.withoutWaldo.map(row => ({
+      ...row,
+      inputTokens: Math.round(row.inputTokens * scale),
+      outputTokens: Math.round(row.outputTokens * scale),
+    })),
+  }
 }
