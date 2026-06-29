@@ -83,8 +83,11 @@ export function OverviewPage() {
           <p className="font-medium">Could not load usage data</p>
           <p className="text-red-700 mt-1">{error}</p>
           <p className="text-red-600 text-xs mt-2">
-            Using mock data? Set <code className="bg-red-100 px-1 rounded">VITE_USE_MOCK=true</code> in{' '}
+            Demo mode uses mock data by default. Set{' '}
+            <code className="bg-red-100 px-1 rounded">VITE_USE_MOCK=true</code> in{' '}
             <code className="bg-red-100 px-1 rounded">.env</code> and restart the dev server.
+            Live Glean APIs also require <code className="bg-red-100 px-1 rounded">VITE_GLEAN_API_READY=true</code>{' '}
+            once the provider is implemented.
           </p>
         </div>
       )}
