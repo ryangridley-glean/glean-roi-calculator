@@ -25,6 +25,26 @@ export interface HealthMetrics {
   stickiness: number
 }
 
+export type ModelId = 'gpt-5.5' | 'opus-4.8' | 'waldo'
+
+export interface ModelTokenUsage {
+  modelId: ModelId
+  inputTokens: number
+  outputTokens: number
+}
+
+export interface DailyWaldoSnapshot {
+  date: string
+  waldoEligibleQueries: number
+}
+
+export interface WaldoUsageSummary {
+  waldoEligibleQueries: number
+  withWaldo: ModelTokenUsage[]
+  withoutWaldo: ModelTokenUsage[]
+  dailySnapshots: DailyWaldoSnapshot[]
+}
+
 export interface UsageSummary {
   totalSearchQueries: number
   totalChatSessions: number
@@ -35,4 +55,5 @@ export interface UsageSummary {
   totalEmployees: number
   signedUpEmployees: number
   health: HealthMetrics
+  waldoUsage: WaldoUsageSummary
 }

@@ -2,15 +2,19 @@ import { useState } from 'react'
 import { useFilters } from '@/store/FilterContext'
 import { useMetrics } from '@/store/hooks/useMetrics'
 import { useROI } from '@/store/hooks/useROI'
+import { useWaldoSavings } from '@/store/hooks/useWaldoSavings'
 import { DEFAULT_ASSUMPTIONS, type ROIAssumptions } from '@/lib/roi'
+import { MODEL_RATES, WALDO_PER_QUERY, FRONTIER_MODEL_SHARES } from '@/constants/modelRates'
 import { HealthMetricBar } from '@/components/cards/HealthMetricBar'
 import { StatCard } from '@/components/cards/StatCard'
 import { ROISummaryCard } from '@/components/cards/ROISummaryCard'
+import { WaldoSavingsCard } from '@/components/cards/WaldoSavingsCard'
 import { ContractCard } from '@/components/cards/ContractCard'
 import { ActiveUsersTrend } from '@/components/charts/ActiveUsersTrend'
 import { ActiveUsersByProduct } from '@/components/charts/ActiveUsersByProduct'
 import { TotalInteractionsByProduct } from '@/components/charts/TotalInteractionsByProduct'
 import { TimeSavedBar } from '@/components/charts/TimeSavedBar'
+import { WaldoSavingsTabs } from '@/components/tabs/WaldoSavingsTabs'
 import { DepartmentFilter } from '@/components/filters/DepartmentFilter'
 import { DateRangePicker } from '@/components/filters/DateRangePicker'
 import { formatNumber } from '@/lib/formatters'
@@ -26,7 +30,7 @@ function loadAssumptions(): ROIAssumptions {
 
 export function OverviewPage() {
   const { filters } = useFilters()
-  const { data, isLoading } = useMetrics(filters)
+  const { data, isLoading, error } = useMetrics(filters)
 
   const [contractValue, setContractValue] = useState<number | null>(() => {
     const saved = localStorage.getItem('glean_contract_value')
@@ -35,6 +39,7 @@ export function OverviewPage() {
 
   const [assumptions, setAssumptions] = useState<ROIAssumptions>(loadAssumptions)
   const [showAssumptions, setShowAssumptions] = useState(false)
+  const [showWaldoMethodology, setShowWaldoMethodology] = useState(false)
 
   function handleContractValueChange(val: number | null) {
     setContractValue(val)
@@ -52,6 +57,7 @@ export function OverviewPage() {
 
   const effectiveContractValue = contractValue ?? data?.contract.contractValueUsd ?? null
   const roi = useROI(data?.summary ?? null, effectiveContractValue, assumptions)
+  const waldoSavings = useWaldoSavings(data?.summary)
   const summary = data?.summary
   const health = summary?.health
 
@@ -71,6 +77,20 @@ export function OverviewPage() {
           How ROI is calculated
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl px-4 py-3 text-sm">
+          <p className="font-medium">Could not load usage data</p>
+          <p className="text-red-700 mt-1">{error}</p>
+          <p className="text-red-600 text-xs mt-2">
+            Demo mode uses mock data by default. Set{' '}
+            <code className="bg-red-100 px-1 rounded">VITE_USE_MOCK=true</code> in{' '}
+            <code className="bg-red-100 px-1 rounded">.env</code> and restart the dev server.
+            Live Glean APIs also require <code className="bg-red-100 px-1 rounded">VITE_GLEAN_API_READY=true</code>{' '}
+            once the provider is implemented.
+          </p>
+        </div>
+      )}
 
       {/* ── Filter bar ───────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
@@ -214,6 +234,76 @@ export function OverviewPage() {
           />
         )}
       </div>
+
+      {/* ─────────────────── WALDO TOKEN SAVINGS ───────────────── */}
+
+      <div className="pt-2">
+        <div className="flex items-center justify-between mb-1">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">Waldo token savings</h2>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Value from Waldo orchestrating Assistant and Agents queries before frontier models run
+            </p>
+          </div>
+          <button
+            onClick={() => setShowWaldoMethodology(v => !v)}
+            className="flex items-center gap-1 text-sm text-emerald-600 hover:underline shrink-0 ml-4"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            How savings are calculated
+          </button>
+        </div>
+      </div>
+
+      {showWaldoMethodology && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">
+            Waldo Token Savings Methodology
+          </h3>
+          <p className="text-xs text-gray-600 mb-4">
+            Waldo is Glean&apos;s agentic search model that runs before frontier LLMs, handling retrieval
+            and orchestration so expensive models only see refined context. Savings are computed as
+            the difference between a counterfactual &quot;frontier-only&quot; baseline and actual spend
+            (frontier + Waldo).
+          </p>
+          <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
+            <div className="bg-white rounded-lg p-3 border border-emerald-100">
+              <p className="font-semibold text-gray-800 mb-2">Per-query tokens (without Waldo)</p>
+              <p>Frontier input: {WALDO_PER_QUERY.withoutWaldo.frontierInput.toLocaleString()}</p>
+              <p>Frontier output: {WALDO_PER_QUERY.withoutWaldo.frontierOutput.toLocaleString()}</p>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-emerald-100">
+              <p className="font-semibold text-gray-800 mb-2">Per-query tokens (with Waldo)</p>
+              <p>Frontier input: {WALDO_PER_QUERY.withWaldo.frontierInput.toLocaleString()}</p>
+              <p>Frontier output: {WALDO_PER_QUERY.withWaldo.frontierOutput.toLocaleString()}</p>
+              <p>Waldo input: {WALDO_PER_QUERY.withWaldo.waldoInput.toLocaleString()}</p>
+              <p>Waldo output: {WALDO_PER_QUERY.withWaldo.waldoOutput.toLocaleString()}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-xs text-gray-600">
+            {(['waldo', 'gpt-5.5', 'opus-4.8'] as const).map(id => (
+              <span key={id}>
+                <strong>{MODEL_RATES[id].label}:</strong>{' '}
+                ${MODEL_RATES[id].inputPerM}/M in · ${MODEL_RATES[id].outputPerM}/M out
+                {MODEL_RATES[id].sourceNote && (
+                  <span className="text-gray-400"> ({MODEL_RATES[id].sourceNote})</span>
+                )}
+              </span>
+            ))}
+          </div>
+          <p className="text-[10px] text-gray-400 mt-3">
+            Traffic split: {Math.round(FRONTIER_MODEL_SHARES['gpt-5.5'] * 100)}% GPT-5.5 ·{' '}
+            {Math.round(FRONTIER_MODEL_SHARES['opus-4.8'] * 100)}% Opus 4.8 ·{' '}
+            {WALDO_PER_QUERY.divertedTotalTokens.toLocaleString()} tokens diverted per query (~25%)
+          </p>
+        </div>
+      )}
+
+      <WaldoSavingsCard savings={waldoSavings} isLoading={isLoading} />
+
+      <WaldoSavingsTabs savings={waldoSavings} isLoading={isLoading} />
     </div>
   )
 }

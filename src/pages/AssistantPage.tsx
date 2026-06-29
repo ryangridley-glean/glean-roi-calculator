@@ -14,7 +14,7 @@ const TOP_TOPICS = [
   { topic: 'Other', sessions: 1490, pct: 18 },
 ]
 
-const DEPTH_CHAT = [
+const DEPT_CHAT = [
   { name: 'Engineering', sessions: 4800, color: 'bg-blue-500' },
   { name: 'Support',     sessions: 3900, color: 'bg-indigo-500' },
   { name: 'Sales',       sessions: 2100, color: 'bg-violet-500' },
@@ -64,7 +64,7 @@ export function AssistantPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <p className="text-sm font-semibold text-gray-900 mb-4">Top conversation topics</p>
           <div className="space-y-3">
-            {TOP_TOPICS,map(t => (
+            {TOP_TOPICS.map(t => (
               <div key={t.topic}>
                 <div className="flex justify-between text-xs mb-1">
                   <span className="text-gray-700">{t.topic}</span>

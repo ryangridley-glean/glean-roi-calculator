@@ -1,4 +1,5 @@
 import { daysBetween } from '@/lib/dateUtils'
+import { buildWaldoUsageFromSnapshots } from '@/lib/waldoValue'
 import type { DailySnapshot, DepartmentUsage } from '@/types/metrics'
 
 const DEPARTMENTS = ['Engineering', 'Sales', 'Marketing', 'Support', 'Finance', 'HR', 'Legal', 'Product']
@@ -81,4 +82,33 @@ export function generateDepartmentUsage(snapshots: DailySnapshot[]): DepartmentU
       activeUsers:   Math.round(sum('activeUsers') / snapshots.length),
     }
   })
+}
+
+export function generateWaldoUsage(snapshots: DailySnapshot[]) {
+  const dailySnapshots = snapshots.map((s, i) => {
+    const variance = 1 + (seededRand(i * 11 + 7) - 0.5) * 0.1
+    const queries = Math.max(0, Math.round((s.chatSessions + s.agentRuns) * variance))
+    return { date: s.date, waldoEligibleQueries: queries }
+  })
+
+  const base = buildWaldoUsageFromSnapshots(snapshots)
+  const waldoEligibleQueries = dailySnapshots.reduce((sum, d) => sum + d.waldoEligibleQueries, 0)
+  const scale = base.waldoEligibleQueries > 0
+    ? waldoEligibleQueries / base.waldoEligibleQueries
+    : 1
+
+  return {
+    waldoEligibleQueries,
+    dailySnapshots,
+    withWaldo: base.withWaldo.map(row => ({
+      ...row,
+      inputTokens: Math.round(row.inputTokens * scale),
+      outputTokens: Math.round(row.outputTokens * scale),
+    })),
+    withoutWaldo: base.withoutWaldo.map(row => ({
+      ...row,
+      inputTokens: Math.round(row.inputTokens * scale),
+      outputTokens: Math.round(row.outputTokens * scale),
+    })),
+  }
 }

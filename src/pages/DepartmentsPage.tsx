@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BENCHMARKS } from '@/constants/benchmarks'
 
-const HOURLY_RATE = BECHMARKS.avgHourlySalaryUsd
+const HOURLY_RATE = BENCHMARKS.avgHourlySalaryUsd
 const RISK_ADJ   = 1 - BENCHMARKS.riskAdjustment
 
 interface Dept {
@@ -65,7 +65,7 @@ export function DepartmentsPage() {
   const totalMAU   = DEPARTMENTS.reduce((s, d) => s + d.mau, 0)
 
   return (
-    <div className="px-8 py-6 max-w-5ln space-y-6">
+    <div className="px-8 py-6 max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Departments</h1>
@@ -111,7 +111,7 @@ export function DepartmentsPage() {
                     <p className="font-semibold text-gray-900">{dept.name}</p>
                     <span className={`text-sm font-bold ${healthColor(activity)}`}>{activity}% activity</span>
                   </div>
-                  <div className="w5-full bg-gray-100 rounded-full h-2">
+                  <div className="w-full bg-gray-100 rounded-full h-2">
                     <div className={`h-2 rounded-full ${healthBg(activity)}`} style={{ width: `${activity}%` }} />
                   </div>
                 </div>
@@ -120,7 +120,7 @@ export function DepartmentsPage() {
                     { label: 'Users', value: dept.totalUsers },
                     { label: 'MAU', value: dept.mau },
                     { label: 'WAU', value: dept.wau },
-                    { label: 'Est. ROI', value: `$${roi/1000}.toFixed(0)}K`, highlight: true },
+                    { label: 'Est. ROI', value: `$${(roi / 1000).toFixed(0)}K`, highlight: true },
                   ].map(m => (
                     <div key={m.label}>
                       <p className={`text-base font-bold ${m.highlight ? 'text-emerald-600' : 'text-gray-900'}`}>{m.value}</p>
@@ -165,7 +165,7 @@ export function DepartmentsPage() {
                   </div>
                   <div className="bg-emerald-50 rounded-lg p-3 space-y-2">
                     <p className="font-semibold text-emerald-700 text-xs uppercase tracking-wide">Value Delivered</p>
-                    <p className="text-2xl font-bold text-emerald-700">$${roi/1000}.toFixed(1)}K</p>
+                    <p className="text-2xl font-bold text-emerald-700">${(roi / 1000).toFixed(1)}K</p>
                     <p className="text-xs text-emerald-600">estimated annual value</p>
                     {activity < 20 && (
                       <p className="text-[10px] text-amber-700 bg-amber-50 rounded p-1 mt-1">
