@@ -18,7 +18,9 @@ export class GleanDataProvider implements DataProvider {
 
   async getMetrics(_req: MetricsRequest): Promise<MetricsResponse> {
     // TODO: implement when Glean Admin API credentials are available
-    // Map MetricsRequest → Glean query params, then transform response
+    // Map MetricsRequest → Glean query params, then transform response.
+    // Waldo token usage: map from GET /billingmodelusage and POST /fetchbillingtrend
+    // (see scio openapi/public/client/billing.yaml) into UsageSummary.waldoUsage.
     await this.client.get(ENDPOINTS.analytics)
     throw new Error('Glean API integration not yet implemented. Set VITE_USE_MOCK=true.')
   }

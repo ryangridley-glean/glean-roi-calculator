@@ -2,7 +2,7 @@ import type { DataProvider, MetricsRequest, MetricsResponse } from '@/types/api'
 import type { ContractInfo } from '@/types/contract'
 import type { AgentUseCase } from '@/types/agents'
 import type { UsageSummary } from '@/types/metrics'
-import { generateDailySnapshots, generateDepartmentUsage } from './generators'
+import { generateDailySnapshots, generateDepartmentUsage, generateWaldoUsage } from './generators'
 import { AGENT_USE_CASES } from './agentUseCases'
 
 const DEPARTMENTS = ['Engineering', 'Sales', 'Marketing', 'Support', 'Finance', 'HR', 'Legal', 'Product']
@@ -47,6 +47,7 @@ export class MockDataProvider implements DataProvider {
         activity: 9,
         stickiness: 53,
       },
+      waldoUsage: generateWaldoUsage(snapshots),
     }
 
     const byDepartment = generateDepartmentUsage(snapshots)
