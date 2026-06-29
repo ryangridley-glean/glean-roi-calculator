@@ -1,9 +1,14 @@
 import { useMemo } from 'react'
+import { generateWaldoUsage } from '@/api/mock/generators'
 import { computeWaldoSavings, type WaldoSavingsResult } from '@/lib/waldoValue'
-import type { WaldoUsageSummary } from '@/types/metrics'
+import type { UsageSummary } from '@/types/metrics'
 
 export function useWaldoSavings(
-  waldoUsage: WaldoUsageSummary | null | undefined,
+  summary: UsageSummary | null | undefined,
 ): WaldoSavingsResult | null {
-  return useMemo(() => computeWaldoSavings(waldoUsage), [waldoUsage])
+  return useMemo(() => {
+    if (!summary) return null
+    const waldoUsage = summary.waldoUsage ?? generateWaldoUsage(summary.dailySnapshots)
+    return computeWaldoSavings(waldoUsage)
+  }, [summary])
 }

@@ -8,13 +8,23 @@ interface WaldoSavingsCardProps {
 }
 
 export function WaldoSavingsCard({ savings, isLoading }: WaldoSavingsCardProps) {
-  if (isLoading || !savings) {
+  if (isLoading) {
     return (
       <div className="card border-t-4 border-t-emerald-500 space-y-4">
         <Skeleton className="h-5 w-40" />
         <div className="grid grid-cols-4 gap-6">
           {[0, 1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full" />)}
         </div>
+      </div>
+    )
+  }
+
+  if (!savings) {
+    return (
+      <div className="card border-t-4 border-t-emerald-500">
+        <p className="text-sm text-glean-text-secondary">
+          No Waldo-eligible Assistant or Agents activity in this period.
+        </p>
       </div>
     )
   }

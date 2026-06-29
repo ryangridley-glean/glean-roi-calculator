@@ -11,7 +11,14 @@ interface WaldoCostComparisonProps {
 }
 
 export function WaldoCostComparison({ savings, isLoading }: WaldoCostComparisonProps) {
-  if (isLoading || !savings) return <Skeleton className="h-72 w-full rounded-xl" />
+  if (isLoading) return <Skeleton className="h-72 w-full rounded-xl" />
+  if (!savings) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-xl p-6 h-72 flex items-center justify-center">
+        <p className="text-sm text-gray-500">No Waldo savings data for this period.</p>
+      </div>
+    )
+  }
 
   const data = [
     {

@@ -30,7 +30,7 @@ function loadAssumptions(): ROIAssumptions {
 
 export function OverviewPage() {
   const { filters } = useFilters()
-  const { data, isLoading } = useMetrics(filters)
+  const { data, isLoading, error } = useMetrics(filters)
 
   const [contractValue, setContractValue] = useState<number | null>(() => {
     const saved = localStorage.getItem('glean_contract_value')
@@ -57,7 +57,7 @@ export function OverviewPage() {
 
   const effectiveContractValue = contractValue ?? data?.contract.contractValueUsd ?? null
   const roi = useROI(data?.summary ?? null, effectiveContractValue, assumptions)
-  const waldoSavings = useWaldoSavings(data?.summary?.waldoUsage)
+  const waldoSavings = useWaldoSavings(data?.summary)
   const summary = data?.summary
   const health = summary?.health
 
@@ -77,6 +77,17 @@ export function OverviewPage() {
           How ROI is calculated
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl px-4 py-3 text-sm">
+          <p className="font-medium">Could not load usage data</p>
+          <p className="text-red-700 mt-1">{error}</p>
+          <p className="text-red-600 text-xs mt-2">
+            Using mock data? Set <code className="bg-red-100 px-1 rounded">VITE_USE_MOCK=true</code> in{' '}
+            <code className="bg-red-100 px-1 rounded">.env</code> and restart the dev server.
+          </p>
+        </div>
+      )}
 
       {/* ── Filter bar ───────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
