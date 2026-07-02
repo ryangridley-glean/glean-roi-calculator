@@ -1,5 +1,8 @@
 import type { CompetitorId, CompetitorProfile, ConsolidationItem, StackCoverageRow } from '@/types/tco'
 
+export const GLEAN_PLATFORM_SOURCE_NOTE =
+  'Enterprise Glean is custom-quoted per seat; effective rate = contract value ÷ licensed seats. Glean Search is included — no supplemental index cost.'
+
 export const COMPETITORS: Record<CompetitorId, CompetitorProfile> = {
   'microsoft-copilot': {
     id: 'microsoft-copilot',
@@ -8,14 +11,19 @@ export const COMPETITORS: Record<CompetitorId, CompetitorProfile> = {
     color: '#0078D4',
     perSeatMonthlyUsd: 30,
     productivitySuiteMonthlyUsd: 36,
+    productivitySuiteLabel: 'Microsoft 365 E3',
     supplementalSearchAnnualUsd: 48_000,
     diyFteRequired: 0.5,
     diyFteLoadedCostUsd: 165_000,
     infraAnnualUsd: 36_000,
     inferenceCostMultiplier: 2.8,
+    inferenceMultiplierNote:
+      '2.8× Glean Model Hub spend — Azure OpenAI frontier routing without Waldo cost optimization (derived from period usage).',
     coveragePct: 62,
     gaps: ['Salesforce', 'Zendesk', 'Confluence (non-M365)', 'Custom internal apps'],
     strengths: ['Deep Word/Outlook/Teams integration', 'Familiar Microsoft UX'],
+    sourceNote:
+      'Copilot for M365: $30/user/mo add-on (annual commit, Microsoft list, Jan 2025). Requires qualifying M365 E3 (~$36/user/mo) or E5 (~$57/user/mo) purchased separately.',
   },
   'chatgpt-enterprise': {
     id: 'chatgpt-enterprise',
@@ -24,30 +32,39 @@ export const COMPETITORS: Record<CompetitorId, CompetitorProfile> = {
     color: '#10A37F',
     perSeatMonthlyUsd: 60,
     productivitySuiteMonthlyUsd: 0,
-    supplementalSearchAnnualUsd: 72_000,
+    supplementalSearchAnnualUsd: 60_000,
     diyFteRequired: 2,
     diyFteLoadedCostUsd: 180_000,
     infraAnnualUsd: 96_000,
     inferenceCostMultiplier: 3.9,
+    inferenceMultiplierNote:
+      '3.9× Glean spend — ChatGPT Enterprise API at list rates with no model routing or volume optimization.',
     coveragePct: 45,
     gaps: ['Permission-aware enterprise retrieval', 'Cross-app orchestration', 'Governed agent workflows'],
     strengths: ['Strong general reasoning', 'Fast time-to-first-chat'],
+    sourceNote:
+      'ChatGPT Enterprise: ~$60/user/mo (OpenAI enterprise list, 2025–2026; custom volume pricing common).',
   },
   'google-gemini': {
     id: 'google-gemini',
     label: 'Google Gemini Workspace',
     shortLabel: 'Gemini',
     color: '#4285F4',
-    perSeatMonthlyUsd: 30,
-    productivitySuiteMonthlyUsd: 18,
-    supplementalSearchAnnualUsd: 52_000,
+    perSeatMonthlyUsd: 0,
+    productivitySuiteMonthlyUsd: 24,
+    productivitySuiteLabel: 'Google Workspace Enterprise Standard',
+    supplementalSearchAnnualUsd: 48_000,
     diyFteRequired: 0.5,
     diyFteLoadedCostUsd: 165_000,
     infraAnnualUsd: 32_000,
     inferenceCostMultiplier: 2.6,
+    inferenceMultiplierNote:
+      '2.6× Glean spend — Vertex AI / Gemini API frontier routing without Model Hub.',
     coveragePct: 58,
     gaps: ['Microsoft 365 content', 'Salesforce', 'On-prem file shares', 'Proprietary internal wikis'],
-    strengths: ['Gmail/Docs/Sheets native', 'Competitive per-seat pricing'],
+    strengths: ['Gmail/Docs/Sheets native', 'Gemini included in Workspace plans'],
+    sourceNote:
+      'Gemini bundled in Workspace Business Standard+ (Mar 2025). Enterprise Standard ~$24/user/mo list (annual); legacy Gemini add-on was $20–30/user/mo.',
   },
   'build-your-own': {
     id: 'build-your-own',
@@ -61,9 +78,13 @@ export const COMPETITORS: Record<CompetitorId, CompetitorProfile> = {
     diyFteLoadedCostUsd: 185_000,
     infraAnnualUsd: 120_000,
     inferenceCostMultiplier: 3.2,
+    inferenceMultiplierNote:
+      '3.2× Glean spend — direct provider API keys at list rates, no negotiated routing or Waldo optimization.',
     coveragePct: 40,
     gaps: ['Unified UX', 'Ongoing connector maintenance', 'Enterprise permissions model'],
     strengths: ['Full control', 'No vendor platform fee'],
+    sourceNote:
+      'No platform license fee; costs are FTE labor (~3 FTE loaded), cloud infra (~$120K/yr), and direct LLM API usage.',
   },
 }
 

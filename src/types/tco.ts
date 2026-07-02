@@ -18,9 +18,15 @@ export interface CompetitorProfile {
   diyFteLoadedCostUsd: number
   infraAnnualUsd: number
   inferenceCostMultiplier: number
+  /** How the inference multiplier was chosen (Waldo usage baseline). */
+  inferenceMultiplierNote: string
   coveragePct: number
   gaps: string[]
   strengths: string[]
+  /** Public/list pricing citation shown as UI footnote. */
+  sourceNote: string
+  /** Label for productivity suite line item when productivitySuiteMonthlyUsd > 0. */
+  productivitySuiteLabel?: string
 }
 
 export interface TCOLineItem {
@@ -41,6 +47,9 @@ export interface TCOComparisonResult {
   activeSeats: number
   glean: {
     platformAnnualUsd: number
+    /** Contract-derived effective platform rate (annual contract ÷ licensed seats ÷ 12). */
+    effectivePerSeatMonthlyUsd: number | null
+    platformSourceNote: string
     inferenceAnnualUsd: number
     adminAnnualUsd: number
     totalCostAnnualUsd: number

@@ -63,6 +63,12 @@ export function ScenarioModelerPage() {
                 <p className="font-semibold text-glean-text-primary text-sm">{comp.label}</p>
               </div>
               <p className="text-xs text-glean-text-tertiary">{comp.coveragePct}% stack coverage · {comp.gaps.length} known gaps</p>
+              {comp.perSeatMonthlyUsd > 0 && (
+                <p className="text-[10px] text-glean-text-tertiary mt-1">${comp.perSeatMonthlyUsd}/user/mo AI add-on</p>
+              )}
+              {comp.productivitySuiteMonthlyUsd > 0 && (
+                <p className="text-[10px] text-glean-text-tertiary mt-0.5">+ ${comp.productivitySuiteMonthlyUsd}/user/mo {comp.productivitySuiteLabel ?? 'suite'}</p>
+              )}
             </button>
           ))}
         </div>
@@ -158,9 +164,26 @@ export function ScenarioModelerPage() {
 
       <p className="text-[10px] text-glean-text-tertiary">
         Inference costs derived from actual Assistant & Agents usage in the selected period, annualized.
-        Competitor inference assumes frontier-only routing at {tco?.competitor.inferenceCostMultiplier ?? '—'}× Glean Model Hub spend.
-        Productivity value uses Forrester TEI benchmarks with risk adjustment.
+        {tco && (
+          <> Competitor inference: {tco.competitor.inferenceMultiplierNote}</>
+        )}
+        {' '}Productivity value uses Forrester TEI benchmarks with risk adjustment.
       </p>
+      {tco?.competitor.sourceNote && (
+        <p className="text-[10px] text-glean-text-tertiary border-l-2 border-glean-border pl-3">
+          <span className="font-medium text-glean-text-secondary">{tco.competitor.shortLabel} pricing: </span>
+          {tco.competitor.sourceNote}
+        </p>
+      )}
+      {tco?.glean.platformSourceNote && (
+        <p className="text-[10px] text-glean-text-tertiary border-l-2 border-glean-border pl-3">
+          <span className="font-medium text-glean-text-secondary">Glean platform: </span>
+          {tco.glean.platformSourceNote}
+          {tco.glean.effectivePerSeatMonthlyUsd != null && (
+            <> Effective rate in this scenario: ${tco.glean.effectivePerSeatMonthlyUsd.toFixed(2)}/seat/mo.</>
+          )}
+        </p>
+      )}
     </div>
   )
 }

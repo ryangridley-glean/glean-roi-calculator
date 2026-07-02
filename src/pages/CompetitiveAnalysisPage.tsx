@@ -8,6 +8,7 @@ import { TCOComparisonChart } from '@/components/charts/TCOComparisonChart'
 import { TCOLineItemsTable } from '@/components/cards/TCOLineItemsTable'
 import { ConsolidationSavingsChart } from '@/components/charts/ConsolidationSavingsChart'
 import { StackCoverageChart } from '@/components/charts/StackCoverageChart'
+import { formatCurrency } from '@/lib/formatters'
 import { COMPETITORS } from '@/constants/competitors'
 
 type Tab = 'tco' | 'consolidation' | 'coverage'
@@ -98,6 +99,21 @@ export function CompetitiveAnalysisPage() {
             competitorLabel={tco?.competitor.shortLabel ?? 'Competitor'}
             isLoading={isLoading}
           />
+          {tco && (
+            <div className="space-y-2">
+              <p className="text-[10px] text-glean-text-tertiary border-l-2 border-glean-border pl-3">
+                <span className="font-medium text-glean-text-secondary">{tco.competitor.shortLabel} pricing: </span>
+                {tco.competitor.sourceNote}
+              </p>
+              <p className="text-[10px] text-glean-text-tertiary border-l-2 border-glean-border pl-3">
+                <span className="font-medium text-glean-text-secondary">Glean platform: </span>
+                {tco.glean.platformSourceNote}
+                {tco.glean.effectivePerSeatMonthlyUsd != null && (
+                  <> Effective rate: ${tco.glean.effectivePerSeatMonthlyUsd.toFixed(2)}/seat/mo.</>
+                )}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

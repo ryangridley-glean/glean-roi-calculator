@@ -1,4 +1,4 @@
-import { CONSOLIDATION_ITEMS, getCompetitor } from '@/constants/competitors'
+import { CONSOLIDATION_ITEMS, GLEAN_PLATFORM_SOURCE_NOTE, getCompetitor } from '@/constants/competitors'
 import { diffDays } from '@/lib/dateUtils'
 import { computeROI, type ROIAssumptions } from '@/lib/roi'
 import type { WaldoSavingsResult } from '@/lib/waldoValue'
@@ -73,9 +73,9 @@ export function computeTCOComparison(params: {
   })
 
   const gleanPlatformAnnual = contractValueUsd ?? contract.contractValueUsd ?? 0
-  const gleanEffectivePerSeatMo = seats > 0
-    ? gleanPlatformAnnual / seats / 12
-    : 0
+  const gleanEffectivePerSeatMo = seats > 0 && gleanPlatformAnnual > 0
+    ? Math.round((gleanPlatformAnnual / seats / 12) * 100) / 100
+    : null
   const gleanInferencePeriod = waldoSavings?.totalWithWaldoCostUsd ?? 0
   const competitorInferencePeriod = (waldoSavings?.baselineFrontierCostUsd ?? gleanInferencePeriod)
     * competitor.inferenceCostMultiplier
@@ -123,27 +123,29 @@ export function computeTCOComparison(params: {
     {
       id: 'platform',
       label: 'AI platform licenses',
-      description: 'Annual AI add-on subscription (active seats)',
+      description: competitor.perSeatMonthlyUsd > 0
+        ? 'Annual AI add-on subscription (active seats)'
+        : 'No separate AI platform fee',
       gleanUsd: gleanPlatformAnnual,
       competitorUsd: competitorPlatformAnnual,
       category: 'platform' as const,
-      gleanSourceNote: gleanPlatformAnnual > 0
+      gleanSourceNote: gleanEffectivePerSeatMo != null
         ? `$${gleanEffectivePerSeatMo.toFixed(2)}/seat/mo effective (contract)`
         : 'Contract value not set',
       competitorSourceNote: competitor.perSeatMonthlyUsd > 0
-        ? `$${competitor.perSeatMonthlyUsd}/user/mo list · ${active.toLocaleString()} active seats (Microsoft list price)`
+        ? `$${competitor.perSeatMonthlyUsd}/user/mo · ${active.toLocaleString()} active seats`
         : undefined,
     },
     ...(competitorProductivitySuiteAnnual > 0
       ? [{
           id: 'productivity-suite',
-          label: 'Productivity suite (M365)',
-          description: 'Base Microsoft 365 E3 licenses (all licensed seats)',
+          label: competitor.productivitySuiteLabel ?? 'Productivity suite',
+          description: 'Base workspace licenses (all licensed seats)',
           gleanUsd: 0,
           competitorUsd: competitorProductivitySuiteAnnual,
           category: 'platform' as const,
           gleanSourceNote: 'Sunk cost — already licensed',
-          competitorSourceNote: `$${competitor.productivitySuiteMonthlyUsd}/user/mo E3 · ${seats.toLocaleString()} licensed seats (Microsoft list price)`,
+          competitorSourceNote: `$${competitor.productivitySuiteMonthlyUsd}/user/mo · ${seats.toLocaleString()} licensed seats`,
         }]
       : []),
     {
@@ -154,16 +156,19 @@ export function computeTCOComparison(params: {
       competitorUsd: competitorInferenceAnnual,
       category: 'inference' as const,
       gleanSourceNote: 'Actual usage, annualized',
-      competitorSourceNote: `${competitor.inferenceCostMultiplier}× Glean spend (frontier-only routing)`,
+      competitorSourceNote: competitor.inferenceMultiplierNote,
     },
     {
       id: 'search',
       label: 'Supplemental search / index',
-      description: 'Additional tools for non-native data sources',
+      description: 'Azure AI Search or equivalent for non-native data sources',
       gleanUsd: 0,
       competitorUsd: competitorSupplemental,
       category: 'infrastructure' as const,
-      competitorSourceNote: 'Industry estimate for gap coverage',
+      gleanSourceNote: 'Included in Glean platform',
+      competitorSourceNote: competitorSupplemental > 0
+        ? '~$3–5K/mo Azure AI Search tier for mid-size enterprise index'
+        : undefined,
     },
     {
       id: 'infra',
@@ -199,6 +204,8 @@ export function computeTCOComparison(params: {
     activeSeats: active,
     glean: {
       platformAnnualUsd: gleanPlatformAnnual,
+      effectivePerSeatMonthlyUsd: gleanEffectivePerSeatMo,
+      platformSourceNote: GLEAN_PLATFORM_SOURCE_NOTE,
       inferenceAnnualUsd: gleanInferenceAnnual,
       adminAnnualUsd: gleanAdminAnnual,
       totalCostAnnualUsd: gleanTotalCost,

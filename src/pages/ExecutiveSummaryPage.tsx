@@ -89,6 +89,12 @@ export function ExecutiveSummaryPage() {
               <span className="text-glean-text-secondary">Glean annual TCO</span>
               <span className="font-semibold">{formatCurrency(analysis?.tco.glean.totalCostAnnualUsd ?? 0)}</span>
             </div>
+            {analysis?.tco.glean.effectivePerSeatMonthlyUsd != null && (
+              <div className="flex justify-between text-xs">
+                <span className="text-glean-text-tertiary pl-2">Effective platform rate</span>
+                <span className="text-glean-text-tertiary">${analysis.tco.glean.effectivePerSeatMonthlyUsd.toFixed(2)}/seat/mo (contract)</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-glean-text-secondary">{analysis?.tco.competitor.shortLabel} annual TCO</span>
               <span className="font-semibold">{formatCurrency(analysis?.tco.competitorCosts.totalCostAnnualUsd ?? 0)}</span>
