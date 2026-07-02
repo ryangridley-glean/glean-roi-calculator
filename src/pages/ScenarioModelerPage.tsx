@@ -49,7 +49,10 @@ export function ScenarioModelerPage() {
           {(Object.values(COMPETITORS)).map(comp => (
             <button
               key={comp.id}
-              onClick={() => setScenario({ competitorId: comp.id as CompetitorId })}
+              onClick={() => setScenario({
+                competitorId: comp.id as CompetitorId,
+                diyFteCount: comp.diyFteRequired,
+              })}
               className={`
                 text-left card transition-all hover:shadow-card-hover
                 ${scenario.competitorId === comp.id ? 'ring-2 ring-glean-blue border-glean-blue' : ''}

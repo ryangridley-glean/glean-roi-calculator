@@ -44,11 +44,17 @@ export function TCOLineItemsTable({
                     <p className="font-medium text-glean-text-primary">{item.label}</p>
                     <p className="text-xs text-glean-text-tertiary">{item.description}</p>
                   </td>
-                  <td className="px-5 py-3 text-right font-medium text-glean-text-primary">
-                    {formatCurrency(item.gleanUsd)}
+                  <td className="px-5 py-3 text-right">
+                    <p className="font-medium text-glean-text-primary">{formatCurrency(item.gleanUsd)}</p>
+                    {item.gleanSourceNote && (
+                      <p className="text-[10px] text-glean-text-tertiary mt-0.5">{item.gleanSourceNote}</p>
+                    )}
                   </td>
-                  <td className="px-5 py-3 text-right font-medium text-glean-text-primary">
-                    {formatCurrency(item.competitorUsd)}
+                  <td className="px-5 py-3 text-right">
+                    <p className="font-medium text-glean-text-primary">{formatCurrency(item.competitorUsd)}</p>
+                    {item.competitorSourceNote && (
+                      <p className="text-[10px] text-glean-text-tertiary mt-0.5">{item.competitorSourceNote}</p>
+                    )}
                   </td>
                   <td className={`px-5 py-3 text-right font-semibold ${delta >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                     {delta >= 0 ? '+' : ''}{formatCurrency(delta)}

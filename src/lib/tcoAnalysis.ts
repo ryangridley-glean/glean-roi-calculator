@@ -73,6 +73,9 @@ export function computeTCOComparison(params: {
   })
 
   const gleanPlatformAnnual = contractValueUsd ?? contract.contractValueUsd ?? 0
+  const gleanEffectivePerSeatMo = seats > 0
+    ? gleanPlatformAnnual / seats / 12
+    : 0
   const gleanInferencePeriod = waldoSavings?.totalWithWaldoCostUsd ?? 0
   const competitorInferencePeriod = (waldoSavings?.baselineFrontierCostUsd ?? gleanInferencePeriod)
     * competitor.inferenceCostMultiplier
@@ -89,13 +92,18 @@ export function computeTCOComparison(params: {
   const competitorPlatformAnnual = Math.round(
     active * competitor.perSeatMonthlyUsd * 12,
   )
+  const competitorProductivitySuiteAnnual = competitor.productivitySuiteMonthlyUsd > 0
+    ? Math.round(seats * competitor.productivitySuiteMonthlyUsd * 12)
+    : 0
+  const diyFteCount = scenario.diyFteCount ?? competitor.diyFteRequired
   const competitorPeopleAnnual = Math.round(
-    (scenario.diyFteCount || competitor.diyFteRequired) * competitor.diyFteLoadedCostUsd,
+    diyFteCount * competitor.diyFteLoadedCostUsd,
   )
   const competitorSupplemental = competitor.supplementalSearchAnnualUsd
   const competitorInfra = competitor.infraAnnualUsd
   const competitorTotalCost =
     competitorPlatformAnnual +
+    competitorProductivitySuiteAnnual +
     competitorInferenceAnnual +
     competitorSupplemental +
     competitorInfra +
@@ -114,12 +122,30 @@ export function computeTCOComparison(params: {
   const lineItems = [
     {
       id: 'platform',
-      label: 'Platform licenses',
-      description: 'Annual software subscription',
+      label: 'AI platform licenses',
+      description: 'Annual AI add-on subscription (active seats)',
       gleanUsd: gleanPlatformAnnual,
       competitorUsd: competitorPlatformAnnual,
       category: 'platform' as const,
+      gleanSourceNote: gleanPlatformAnnual > 0
+        ? `$${gleanEffectivePerSeatMo.toFixed(2)}/seat/mo effective (contract)`
+        : 'Contract value not set',
+      competitorSourceNote: competitor.perSeatMonthlyUsd > 0
+        ? `$${competitor.perSeatMonthlyUsd}/user/mo list · ${active.toLocaleString()} active seats (Microsoft list price)`
+        : undefined,
     },
+    ...(competitorProductivitySuiteAnnual > 0
+      ? [{
+          id: 'productivity-suite',
+          label: 'Productivity suite (M365)',
+          description: 'Base Microsoft 365 E3 licenses (all licensed seats)',
+          gleanUsd: 0,
+          competitorUsd: competitorProductivitySuiteAnnual,
+          category: 'platform' as const,
+          gleanSourceNote: 'Sunk cost — already licensed',
+          competitorSourceNote: `$${competitor.productivitySuiteMonthlyUsd}/user/mo E3 · ${seats.toLocaleString()} licensed seats (Microsoft list price)`,
+        }]
+      : []),
     {
       id: 'inference',
       label: 'LLM inference',
@@ -127,6 +153,8 @@ export function computeTCOComparison(params: {
       gleanUsd: gleanInferenceAnnual,
       competitorUsd: competitorInferenceAnnual,
       category: 'inference' as const,
+      gleanSourceNote: 'Actual usage, annualized',
+      competitorSourceNote: `${competitor.inferenceCostMultiplier}× Glean spend (frontier-only routing)`,
     },
     {
       id: 'search',
@@ -135,6 +163,7 @@ export function computeTCOComparison(params: {
       gleanUsd: 0,
       competitorUsd: competitorSupplemental,
       category: 'infrastructure' as const,
+      competitorSourceNote: 'Industry estimate for gap coverage',
     },
     {
       id: 'infra',
@@ -143,6 +172,7 @@ export function computeTCOComparison(params: {
       gleanUsd: 0,
       competitorUsd: competitorInfra,
       category: 'infrastructure' as const,
+      competitorSourceNote: 'Industry estimate',
     },
     {
       id: 'people',
@@ -151,6 +181,8 @@ export function computeTCOComparison(params: {
       gleanUsd: gleanAdminAnnual,
       competitorUsd: competitorPeopleAnnual,
       category: 'people' as const,
+      gleanSourceNote: '5% of platform (admin overhead)',
+      competitorSourceNote: `${diyFteCount} FTE × $${competitor.diyFteLoadedCostUsd.toLocaleString()} loaded`,
     },
   ]
 
@@ -175,6 +207,7 @@ export function computeTCOComparison(params: {
     },
     competitorCosts: {
       platformAnnualUsd: competitorPlatformAnnual,
+      productivitySuiteAnnualUsd: competitorProductivitySuiteAnnual,
       inferenceAnnualUsd: competitorInferenceAnnual,
       supplementalAnnualUsd: competitorSupplemental,
       infraAnnualUsd: competitorInfra,

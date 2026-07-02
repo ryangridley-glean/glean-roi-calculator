@@ -8,7 +8,7 @@ import { TCOComparisonChart } from '@/components/charts/TCOComparisonChart'
 import { TCOLineItemsTable } from '@/components/cards/TCOLineItemsTable'
 import { ConsolidationSavingsChart } from '@/components/charts/ConsolidationSavingsChart'
 import { StackCoverageChart } from '@/components/charts/StackCoverageChart'
-import { formatCurrency } from '@/lib/formatters'
+import { COMPETITORS } from '@/constants/competitors'
 
 type Tab = 'tco' | 'consolidation' | 'coverage'
 
@@ -33,6 +33,7 @@ export function CompetitiveAnalysisPage() {
 
   const defaultSeats = data?.contract.licensedSeats ?? 1000
   const { scenario } = useScenarioModel(defaultSeats)
+  const competitorDefaults = COMPETITORS[scenario.competitorId]
   const analysis = useTCOAnalysis({
     summary: data?.summary,
     contract: data?.contract,
@@ -40,7 +41,10 @@ export function CompetitiveAnalysisPage() {
     waldoSavings,
     periodStart: filters.dateRange.start,
     periodEnd: filters.dateRange.end,
-    scenario,
+    scenario: {
+      ...scenario,
+      diyFteCount: competitorDefaults.diyFteRequired,
+    },
   })
 
   const tco = analysis?.tco ?? null

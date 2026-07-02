@@ -9,7 +9,10 @@ export interface CompetitorProfile {
   label: string
   shortLabel: string
   color: string
+  /** AI add-on license (e.g. Copilot $30/user/mo) — billed on active seats */
   perSeatMonthlyUsd: number
+  /** Base productivity suite (e.g. M365 E3) — billed on licensed seats; 0 if N/A */
+  productivitySuiteMonthlyUsd: number
   supplementalSearchAnnualUsd: number
   diyFteRequired: number
   diyFteLoadedCostUsd: number
@@ -27,6 +30,8 @@ export interface TCOLineItem {
   gleanUsd: number
   competitorUsd: number
   category: 'platform' | 'inference' | 'infrastructure' | 'people' | 'consolidation'
+  gleanSourceNote?: string
+  competitorSourceNote?: string
 }
 
 export interface TCOComparisonResult {
@@ -44,6 +49,7 @@ export interface TCOComparisonResult {
   }
   competitorCosts: {
     platformAnnualUsd: number
+    productivitySuiteAnnualUsd: number
     inferenceAnnualUsd: number
     supplementalAnnualUsd: number
     infraAnnualUsd: number
@@ -87,7 +93,7 @@ export const DEFAULT_SCENARIO: ScenarioInputs = {
   adoptionPct: 75,
   hourlyRateUsd: 52,
   shadowToolBudgetUsd: 185_000,
-  diyFteCount: 1.5,
+  diyFteCount: 0.5,
 }
 
 export interface ExecutiveSummaryResult {

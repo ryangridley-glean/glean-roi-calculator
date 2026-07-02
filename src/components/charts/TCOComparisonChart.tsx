@@ -23,7 +23,7 @@ export function TCOComparisonChart({ tco, isLoading }: TCOComparisonChartProps) 
     },
     {
       vendor: tco.competitor.shortLabel,
-      platform: tco.competitorCosts.platformAnnualUsd,
+      platform: tco.competitorCosts.platformAnnualUsd + tco.competitorCosts.productivitySuiteAnnualUsd,
       inference: tco.competitorCosts.inferenceAnnualUsd,
       people: tco.competitorCosts.peopleAnnualUsd + tco.competitorCosts.supplementalAnnualUsd + tco.competitorCosts.infraAnnualUsd,
       total: tco.competitorCosts.totalCostAnnualUsd,
