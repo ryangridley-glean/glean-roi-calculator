@@ -1,4 +1,10 @@
-import { CONSOLIDATION_ITEMS, GLEAN_PLATFORM_SOURCE_NOTE, getCompetitor } from '@/constants/competitors'
+import {
+  CONSOLIDATION_ITEMS,
+  GLEAN_PER_SEAT_MONTHLY_USD,
+  GLEAN_PLATFORM_SOURCE_NOTE,
+  computeGleanPlatformAnnualUsd,
+  getCompetitor,
+} from '@/constants/competitors'
 import { diffDays } from '@/lib/dateUtils'
 import { computeROI, type ROIAssumptions } from '@/lib/roi'
 import type { WaldoSavingsResult } from '@/lib/waldoValue'
@@ -72,10 +78,12 @@ export function computeTCOComparison(params: {
     hourlyRateUsd: scenario.hourlyRateUsd,
   })
 
-  const gleanPlatformAnnual = contractValueUsd ?? contract.contractValueUsd ?? 0
+  const contractOverride = contractValueUsd ?? contract.contractValueUsd ?? null
+  const gleanPlatformAnnual = computeGleanPlatformAnnualUsd(seats, contractOverride)
   const gleanEffectivePerSeatMo = seats > 0 && gleanPlatformAnnual > 0
     ? Math.round((gleanPlatformAnnual / seats / 12) * 100) / 100
     : null
+  const hasContractOverride = contractOverride != null && contractOverride > 0
   const gleanInferencePeriod = waldoSavings?.totalWithWaldoCostUsd ?? 0
   const competitorInferencePeriod = (waldoSavings?.baselineFrontierCostUsd ?? gleanInferencePeriod)
     * competitor.inferenceCostMultiplier
@@ -130,8 +138,10 @@ export function computeTCOComparison(params: {
       competitorUsd: competitorPlatformAnnual,
       category: 'platform' as const,
       gleanSourceNote: gleanEffectivePerSeatMo != null
-        ? `$${gleanEffectivePerSeatMo.toFixed(2)}/seat/mo effective (contract)`
-        : 'Contract value not set',
+        ? hasContractOverride && gleanEffectivePerSeatMo !== GLEAN_PER_SEAT_MONTHLY_USD
+          ? `$${gleanEffectivePerSeatMo.toFixed(2)}/seat/mo effective (contract) · list $${GLEAN_PER_SEAT_MONTHLY_USD}/user/mo`
+          : `$${GLEAN_PER_SEAT_MONTHLY_USD}/user/mo (list) · ${seats.toLocaleString()} licensed seats`
+        : `$${GLEAN_PER_SEAT_MONTHLY_USD}/user/mo (list) · contract value not set`,
       competitorSourceNote: competitor.perSeatMonthlyUsd > 0
         ? `$${competitor.perSeatMonthlyUsd}/user/mo · ${active.toLocaleString()} active seats`
         : undefined,

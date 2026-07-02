@@ -1,7 +1,20 @@
 import type { CompetitorId, CompetitorProfile, ConsolidationItem, StackCoverageRow } from '@/types/tco'
 
+/** Canonical Glean enterprise platform list rate (all-in-one, licensed seats). */
+export const GLEAN_PER_SEAT_MONTHLY_USD = 50
+
 export const GLEAN_PLATFORM_SOURCE_NOTE =
-  'Enterprise Glean is custom-quoted per seat; effective rate = contract value ÷ licensed seats. Glean Search is included — no supplemental index cost.'
+  `Glean enterprise platform: $${GLEAN_PER_SEAT_MONTHLY_USD}/user/mo (list). Custom contracts may differ; effective rate = contract value ÷ licensed seats. Glean Search is included — no supplemental index cost.`
+
+export function computeGleanPlatformAnnualUsd(
+  licensedSeats: number,
+  contractOverrideUsd: number | null | undefined,
+): number {
+  if (contractOverrideUsd != null && contractOverrideUsd > 0) {
+    return contractOverrideUsd
+  }
+  return Math.round(licensedSeats * GLEAN_PER_SEAT_MONTHLY_USD * 12)
+}
 
 export const COMPETITORS: Record<CompetitorId, CompetitorProfile> = {
   'microsoft-copilot': {

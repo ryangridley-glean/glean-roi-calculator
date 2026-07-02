@@ -3,7 +3,7 @@ import { useFilters } from '@/store/FilterContext'
 import { useMetrics } from '@/store/hooks/useMetrics'
 import { useWaldoSavings } from '@/store/hooks/useWaldoSavings'
 import { useScenarioModel, useTCOAnalysis } from '@/store/hooks/useTCOAnalysis'
-import { COMPETITORS } from '@/constants/competitors'
+import { COMPETITORS, GLEAN_PER_SEAT_MONTHLY_USD } from '@/constants/competitors'
 import { BusinessPageHeader } from '@/components/layout/BusinessPageHeader'
 import { TCOComparisonChart } from '@/components/charts/TCOComparisonChart'
 import { ThreeYearTCOChart } from '@/components/charts/ThreeYearTCOChart'
@@ -179,7 +179,8 @@ export function ScenarioModelerPage() {
         <p className="text-[10px] text-glean-text-tertiary border-l-2 border-glean-border pl-3">
           <span className="font-medium text-glean-text-secondary">Glean platform: </span>
           {tco.glean.platformSourceNote}
-          {tco.glean.effectivePerSeatMonthlyUsd != null && (
+          {tco.glean.effectivePerSeatMonthlyUsd != null &&
+            tco.glean.effectivePerSeatMonthlyUsd !== GLEAN_PER_SEAT_MONTHLY_USD && (
             <> Effective rate in this scenario: ${tco.glean.effectivePerSeatMonthlyUsd.toFixed(2)}/seat/mo.</>
           )}
         </p>

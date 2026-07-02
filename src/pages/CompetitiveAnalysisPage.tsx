@@ -9,7 +9,7 @@ import { TCOLineItemsTable } from '@/components/cards/TCOLineItemsTable'
 import { ConsolidationSavingsChart } from '@/components/charts/ConsolidationSavingsChart'
 import { StackCoverageChart } from '@/components/charts/StackCoverageChart'
 import { formatCurrency } from '@/lib/formatters'
-import { COMPETITORS } from '@/constants/competitors'
+import { COMPETITORS, GLEAN_PER_SEAT_MONTHLY_USD } from '@/constants/competitors'
 
 type Tab = 'tco' | 'consolidation' | 'coverage'
 
@@ -108,7 +108,8 @@ export function CompetitiveAnalysisPage() {
               <p className="text-[10px] text-glean-text-tertiary border-l-2 border-glean-border pl-3">
                 <span className="font-medium text-glean-text-secondary">Glean platform: </span>
                 {tco.glean.platformSourceNote}
-                {tco.glean.effectivePerSeatMonthlyUsd != null && (
+                {tco.glean.effectivePerSeatMonthlyUsd != null &&
+                  tco.glean.effectivePerSeatMonthlyUsd !== GLEAN_PER_SEAT_MONTHLY_USD && (
                   <> Effective rate: ${tco.glean.effectivePerSeatMonthlyUsd.toFixed(2)}/seat/mo.</>
                 )}
               </p>

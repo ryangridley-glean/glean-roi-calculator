@@ -11,7 +11,7 @@ const CONTRACT: ContractInfo = {
   companyName: 'Acme Corporation',
   contractStartDate: '2024-06-01',
   contractEndDate: '2026-06-01',
-  contractValueUsd: 240000,
+  contractValueUsd: 600_000,
   licensedSeats: 1000,
 }
 

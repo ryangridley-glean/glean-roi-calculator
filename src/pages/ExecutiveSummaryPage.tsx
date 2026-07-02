@@ -14,6 +14,7 @@ import { ROISummaryCard } from '@/components/cards/ROISummaryCard'
 import { WaldoSavingsCard } from '@/components/cards/WaldoSavingsCard'
 import { DEFAULT_ASSUMPTIONS } from '@/lib/roi'
 import { formatCurrency } from '@/lib/formatters'
+import { GLEAN_PER_SEAT_MONTHLY_USD } from '@/constants/competitors'
 
 function loadAssumptions() {
   try {
@@ -89,7 +90,8 @@ export function ExecutiveSummaryPage() {
               <span className="text-glean-text-secondary">Glean annual TCO</span>
               <span className="font-semibold">{formatCurrency(analysis?.tco.glean.totalCostAnnualUsd ?? 0)}</span>
             </div>
-            {analysis?.tco.glean.effectivePerSeatMonthlyUsd != null && (
+            {analysis?.tco.glean.effectivePerSeatMonthlyUsd != null &&
+              analysis.tco.glean.effectivePerSeatMonthlyUsd !== GLEAN_PER_SEAT_MONTHLY_USD && (
               <div className="flex justify-between text-xs">
                 <span className="text-glean-text-tertiary pl-2">Effective platform rate</span>
                 <span className="text-glean-text-tertiary">${analysis.tco.glean.effectivePerSeatMonthlyUsd.toFixed(2)}/seat/mo (contract)</span>

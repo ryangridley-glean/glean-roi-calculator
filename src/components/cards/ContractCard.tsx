@@ -69,7 +69,7 @@ export function ContractCard({ contract, onContractValueChange }: ContractCardPr
           <span className="text-glean-text-secondary text-sm">$</span>
           <input
             type="text"
-            placeholder="e.g. 240000"
+            placeholder="e.g. 600000"
             value={inputVal}
             onChange={e => setInputVal(e.target.value)}
             onBlur={handleBlur}

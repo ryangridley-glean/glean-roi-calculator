@@ -47,7 +47,7 @@ export interface TCOComparisonResult {
   activeSeats: number
   glean: {
     platformAnnualUsd: number
-    /** Contract-derived effective platform rate (annual contract ÷ licensed seats ÷ 12). */
+    /** Platform rate used for TCO (contract effective or list $50/user/mo). */
     effectivePerSeatMonthlyUsd: number | null
     platformSourceNote: string
     inferenceAnnualUsd: number
