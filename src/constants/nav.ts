@@ -6,8 +6,9 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Executive Summary', id: 'executive-summary', badge: 'NEW' },
-  { label: 'Overview', id: 'overview' },
   { label: 'Scenario Modeler', id: 'scenario-modeler', badge: 'NEW' },
+  { label: 'Competitive Analysis', id: 'competitive-analysis', badge: 'NEW' },
+  { label: 'Overview', id: 'overview' },
   { label: 'Insights chat', id: 'insights-chat' },
   { label: 'Departments', id: 'departments' },
   { label: 'Managers', id: 'managers' },

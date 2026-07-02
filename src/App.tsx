@@ -1,6 +1,9 @@
 import { AppProvider, useApp } from '@/store/AppContext'
 import { FilterProvider } from '@/store/FilterContext'
 import { AppShell } from '@/components/layout/AppShell'
+import { ExecutiveSummaryPage } from '@/pages/ExecutiveSummaryPage'
+import { ScenarioModelerPage } from '@/pages/ScenarioModelerPage'
+import { CompetitiveAnalysisPage } from '@/pages/CompetitiveAnalysisPage'
 import { OverviewPage } from '@/pages/OverviewPage'
 import { DepartmentsPage } from '@/pages/DepartmentsPage'
 import { ManagersPage } from '@/pages/ManagersPage'
@@ -11,6 +14,7 @@ import { PlaceholderPage } from '@/pages/PlaceholderPage'
 const PAGE_TITLES: Record<string, string> = {
   'executive-summary': 'Executive Summary',
   'scenario-modeler': 'Scenario Modeler',
+  'competitive-analysis': 'Competitive Analysis',
   'insights-chat': 'Insights Chat',
   'departments': 'Departments',
   'managers': 'Managers',
@@ -22,6 +26,9 @@ const PAGE_TITLES: Record<string, string> = {
 
 function Router() {
   const { activePage } = useApp()
+  if (activePage === 'executive-summary') return <ExecutiveSummaryPage />
+  if (activePage === 'scenario-modeler') return <ScenarioModelerPage />
+  if (activePage === 'competitive-analysis') return <CompetitiveAnalysisPage />
   if (activePage === 'overview') return <OverviewPage />
   if (activePage === 'departments') return <DepartmentsPage />
   if (activePage === 'managers') return <ManagersPage />
